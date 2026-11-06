@@ -29,6 +29,7 @@ main{max-width:1150px;margin:0 auto;padding:16px;display:grid;grid-template-colu
 .row .fix{flex:none}
 label.t{display:flex;align-items:center;gap:6px;font-weight:600;font-size:12px;cursor:pointer;flex:none}
 input[type=text],input[type=number],textarea,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;padding:7px 9px;font:600 12px Poppins,sans-serif}
+input[type=color]{width:38px;height:30px;padding:0;border:1px solid #334155;border-radius:8px;background:#0f172a;cursor:pointer;flex:none}
 textarea{resize:vertical}
 input[type=range]{width:100%;accent-color:var(--g)}
 input[type=checkbox]{accent-color:var(--g);width:15px;height:15px}
@@ -45,10 +46,10 @@ small{color:#94a3b8;font-size:11px}
 /* preview */
 #prev{display:flex;flex-direction:column;align-items:center;gap:6px}
 #frameBadge{font-size:11px;font-weight:700;color:var(--g)}
-#cap{position:relative;width:min(100%,520px);aspect-ratio:1/1;overflow:hidden;background:#192b52;container-type:inline-size;touch-action:none;user-select:none;border-radius:6px;box-shadow:0 10px 40px #0008}
-#bgBox{position:absolute;inset:0;z-index:0;overflow:hidden}
+#cap{position:relative;width:min(100%,520px);aspect-ratio:1/1;overflow:hidden;background:#000;container-type:inline-size;touch-action:none;user-select:none;border-radius:6px;box-shadow:0 10px 40px #0008}
+#bgBox{position:absolute;inset:0;z-index:0;overflow:hidden;background:#000}
 #tbox{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);cursor:move;touch-action:none}
-#tbox img,#tbox video{width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+#tbox img,#tbox video{width:100%;height:100%;object-fit:contain;pointer-events:none;display:block}
 #tbox .bd{position:absolute;inset:0;border:2px dashed #ffffff90;pointer-events:none}
 .hd{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #333;z-index:3}
 #grad{position:absolute;left:0;right:0;bottom:0;height:45%;z-index:1;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
@@ -104,6 +105,18 @@ small{color:#94a3b8;font-size:11px}
     <div class="row">
       <input type="text" id="url" placeholder="Atau tempel URL gambar / video…">
       <button class="btn2 fix" id="applyUrl">Pakai</button>
+    </div>
+    <div class="row">
+      <small class="fix">Mode</small>
+      <select id="fitMode">
+        <option value="fit" selected>Fit – tampil utuh, tidak terpotong (auto sesuai format)</option>
+        <option value="fill">Fill – penuhi kanvas (sisi bisa terpotong)</option>
+      </select>
+    </div>
+    <div class="row">
+      <small class="fix">Warna sisa</small>
+      <input type="color" id="bgc" value="#000000">
+      <small>Warna area kosong jika rasio file beda dengan format.</small>
     </div>
     <div class="row"><small class="fix">Zoom</small><input type="range" id="zoom" min="20" max="400" value="100"><small class="fix" id="zoomVal">100%</small><button class="btn2 fix" id="resetImg">Reset</button></div>
     <small>Drag gambar untuk geser, tarik titik sudut / scroll untuk zoom.</small>
@@ -212,6 +225,16 @@ const st={s:1,x:0,y:0};
 
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200);}
 
+/* ---------- mode fit / fill + warna sisa ---------- */
+function applyFit(){
+  const m=$('fitMode').value==='fit'?'contain':'cover';
+  img.style.objectFit=m;vid.style.objectFit=m;
+  $('bgBox').style.background=$('bgc').value;
+  cap.style.background=$('bgc').value;
+}
+$('fitMode').addEventListener('change',()=>{st.x=st.y=0;st.s=1;applyT();applyFit();});
+$('bgc').addEventListener('input',applyFit);
+
 /* ---------- format ---------- */
 function setFormat(k){
   fmt=k;const f=F[k];
@@ -221,7 +244,7 @@ function setFormat(k){
   $('foot').style.bottom=f.foot+'cqw';
   $('frameBadge').textContent=f.label;
   document.querySelectorAll('#fmtSeg button').forEach(b=>b.classList.toggle('on',b.dataset.f===k));
-  st.x=st.y=0;applyT();resetPos();updateDlLabel();
+  st.x=st.y=0;st.s=1;applyT();resetPos();updateDlLabel();
 }
 function updateDlLabel(){$('dl').textContent=mediaType==='video'?'Download Video':`Download PNG (${F[fmt].w}x${F[fmt].h})`;}
 document.querySelectorAll('#fmtSeg button').forEach(b=>b.onclick=()=>setFormat(b.dataset.f));
@@ -300,7 +323,7 @@ $('resetImg').onclick=()=>{st.x=st.y=0;st.s=1;applyT();};
 /* ---------- media ---------- */
 function setImage(src){
   mediaType='image';vid.pause();vid.classList.add('hid');img.classList.remove('hid');$('vidPanel').classList.add('hid');
-  img.src=src;$('stack').style.opacity=1;st.x=st.y=0;st.s=1;applyT();updateDlLabel();
+  img.src=src;$('stack').style.opacity=1;st.x=st.y=0;st.s=1;applyT();applyFit();updateDlLabel();
 }
 function setVideo(src){
   mediaType='video';img.classList.add('hid');vid.classList.remove('hid');$('vidPanel').classList.remove('hid');
@@ -309,7 +332,7 @@ function setVideo(src){
     const d=vid.duration||10;$('vSeek').max=d;$('tStart').value=0;$('tEnd').value=d.toFixed(1);$('tEnd').max=d.toFixed(1);
     trimInfo();vid.playbackRate=speed;vid.play();$('play').textContent='Pause';
   };
-  st.x=st.y=0;st.s=1;applyT();updateDlLabel();toast('Video dimuat, speed 1.02x');
+  st.x=st.y=0;st.s=1;applyT();applyFit();updateDlLabel();toast('Video dimuat, speed 1.02x');
 }
 $('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f);f.type.startsWith('video/')?setVideo(u):setImage(u);};
 $('applyUrl').onclick=()=>{const u=$('url').value.trim();if(!u)return;/\.(mp4|webm|mov)(\?.*)?$/i.test(u)?setVideo(u):setImage(u);};
@@ -351,13 +374,15 @@ function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r
 function render(ctx,W,H,op){
   const R=cap.getBoundingClientRect(),k=W/R.width;
   const rel=el=>{const r=el.getBoundingClientRect();return{x:(r.left-R.left)*k,y:(r.top-R.top)*k,w:r.width*k,h:r.height*k};};
-  ctx.save();ctx.fillStyle='#192b52';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.fillStyle=$('bgc').value;ctx.fillRect(0,0,W,H);
 
   const m=mediaType==='video'?vid:img;
   const mw=mediaType==='video'?vid.videoWidth:img.naturalWidth,mh=mediaType==='video'?vid.videoHeight:img.naturalHeight;
   if(mw>0&&mh>0){
-    const ma=mw/mh;let bw,bh;
-    if(ma>W/H){bh=H;bw=H*ma;}else{bw=W;bh=W/ma;}
+    const ma=mw/mh,fit=$('fitMode').value==='fit';let bw,bh;
+    /* fit = contain (utuh), fill = cover (penuh) */
+    if(ma>W/H){ if(fit){bw=W;bh=W/ma;}else{bh=H;bw=H*ma;} }
+    else{ if(fit){bh=H;bw=H*ma;}else{bw=W;bh=W/ma;} }
     ctx.save();ctx.translate(W/2+st.x*k,H/2+st.y*k);ctx.scale(st.s,st.s);ctx.drawImage(m,-bw/2,-bh/2,bw,bh);ctx.restore();
   }
 
@@ -469,6 +494,7 @@ async function exportVideo(f){
   }catch(err){console.error(err);vid.muted=wasMuted;btn.disabled=false;btn.textContent=old;toast('Gagal merekam video');}
 }
 
+applyFit();
 setFormat('instagram');
 document.fonts.ready.then(()=>{upd();applyT();});
 </script>

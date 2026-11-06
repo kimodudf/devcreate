@@ -55,12 +55,12 @@ small{color:#94a3b8;font-size:11px}
 #stack{position:absolute;left:5cqw;right:5cqw;bottom:11cqw;z-index:2;pointer-events:none}
 #stack .drag{pointer-events:auto;cursor:move;touch-action:none}
 #metaRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2cqw}
-#tag{background:var(--g);color:#000;font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
+#tag{background:var(--g);color:#fff;font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
 #credit{margin-left:auto;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:700;font-size:2.1cqw;padding:.7cqw 2.2cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
 #capBox{background:var(--g);padding:3.2cqw 4.2cqw}
-#hl{margin:0;color:#000;font-weight:900;font-size:5.4cqw;line-height:1.14;letter-spacing:-.025em;white-space:pre-wrap;word-break:break-word;text-align:left}
+#hl{margin:0;color:#fff;font-weight:900;font-size:5.4cqw;line-height:1.14;letter-spacing:-.025em;white-space:pre-wrap;word-break:break-word;text-align:left}
 #foot{position:absolute;left:5cqw;right:5cqw;bottom:3.5cqw;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:3cqw;pointer-events:none}
-#wm{display:flex;align-items:center;gap:1cqw;color:var(--g);font-weight:700;font-size:2.8cqw;white-space:nowrap}
+#wm{display:flex;align-items:center;gap:1cqw;color:#fff;font-weight:700;font-size:2.8cqw;white-space:nowrap}
 #wmIcon{width:3.4cqw;height:3.4cqw;display:block}
 #footTxt{color:#fff;font-weight:600;font-size:2.4cqw;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cap .g{position:absolute;z-index:5;pointer-events:none;transition:border-color .1s}
@@ -159,7 +159,7 @@ small{color:#94a3b8;font-size:11px}
     <div class="row"><label class="t"><input type="checkbox" id="ftOn" checked>Teks kanan</label><input type="text" id="ftIn" value="Ikuti media sosial resmi GENFEEDZ!"></div>
     <div class="row"><label class="t"><input type="checkbox" id="gradOn" checked>Gradien gelap bawah</label></div>
     <div class="row"><label class="t"><input type="checkbox" id="guideOn" checked>Garis bantu tengah</label><label class="t"><input type="checkbox" id="snapOn" checked>Snap ke tengah</label></div>
-    <small>Watermark Instagram @genfeedz (#142e27) bersifat paten &amp; selalu tampil.</small>
+    <small>Watermark Instagram @genfeedz (putih) bersifat paten &amp; selalu tampil.</small>
   </div>
 </div>
 
@@ -186,7 +186,7 @@ small{color:#94a3b8;font-size:11px}
     </div>
     <div id="foot">
       <div id="wm">
-        <svg id="wmIcon" viewBox="0 0 24 24" fill="none" stroke="#142e27" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1.2" fill="#142e27" stroke="none"/></svg>
+        <svg id="wmIcon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg>
         <span id="wmText">@genfeedz</span>
       </div>
       <div id="footTxt"></div>
@@ -200,6 +200,7 @@ small{color:#94a3b8;font-size:11px}
 <script>
 const $=id=>document.getElementById(id);
 const G='#142e27';
+const W_='#ffffff';
 const F={
   instagram:{w:1080,h:1080,vw:1080,vh:1080,fw:520,bot:11,foot:3.5,label:'1080 x 1080 (IG Feed 1:1)'},
   reels:{w:1080,h:1920,vw:1080,vh:1920,fw:340,bot:34,foot:22,label:'1080 x 1920 (IG Reels 9:16)'},
@@ -372,7 +373,7 @@ function render(ctx,W,H,op){
     if($('tagOn').checked){
       const b=rel($('tag')),fs=parseFloat(getComputedStyle($('tag')).fontSize)*k;
       ctx.fillStyle=G;rr(ctx,b.x,b.y,b.w,b.h,.8*W/100);ctx.fill();
-      ctx.font=`900 ${fs}px Poppins,sans-serif`;ctx.fillStyle='#000';ctx.textAlign='center';
+      ctx.font=`900 ${fs}px Poppins,sans-serif`;ctx.fillStyle=W_;ctx.textAlign='center';
       ctx.fillText(($('tagIn').value||'TAG').toUpperCase(),b.x+b.w/2,b.y+b.h/2+fs*.05);
     }
     if($('crOn').checked){
@@ -395,7 +396,7 @@ function render(ctx,W,H,op){
         lines.push(cur);
       });
       const center=$('al').value==='center';
-      ctx.fillStyle='#000';ctx.textAlign=center?'center':'left';
+      ctx.fillStyle=W_;ctx.textAlign=center?'center':'left';
       const tx=center?h.x+h.w/2:h.x,y0=b.y+(b.h-lines.length*lh)/2+lh/2;
       lines.forEach((l,i)=>ctx.fillText(l,tx,y0+i*lh+fs*.04));
       if('letterSpacing' in ctx)ctx.letterSpacing='0px';
@@ -403,15 +404,15 @@ function render(ctx,W,H,op){
     ctx.restore();
   }
 
-  /* watermark paten @yowis.cuk (selalu tampil) */
+  /* watermark paten @genfeedz (putih, selalu tampil) */
   const ic=rel($('wmIcon')),wt=rel($('wmText')),wfs=parseFloat(getComputedStyle($('wmText')).fontSize)*k;
   ctx.save();ctx.translate(ic.x,ic.y);ctx.scale(ic.w/24,ic.h/24);
-  ctx.strokeStyle=G;ctx.fillStyle=G;ctx.lineWidth=2;
+  ctx.strokeStyle=W_;ctx.fillStyle=W_;ctx.lineWidth=2;
   rr(ctx,2,2,20,20,6);ctx.stroke();
   ctx.beginPath();ctx.arc(12,12,4.6,0,Math.PI*2);ctx.stroke();
   ctx.beginPath();ctx.arc(17.6,6.4,1.2,0,Math.PI*2);ctx.fill();
   ctx.restore();
-  ctx.font=`700 ${wfs}px Poppins,sans-serif`;ctx.fillStyle=G;ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.font=`700 ${wfs}px Poppins,sans-serif`;ctx.fillStyle=W_;ctx.textAlign='left';ctx.textBaseline='middle';
   ctx.fillText('@genfeedz',wt.x,wt.y+wt.h/2);
 
   if($('ftOn').checked){

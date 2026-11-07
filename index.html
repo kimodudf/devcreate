@@ -20,6 +20,7 @@ button{font-family:inherit;cursor:pointer}
 .btn{border:0;background:var(--g);color:#000;font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px}
 .btn:disabled{opacity:.6}
 .btn2{border:1px solid #334155;background:#1e293b;color:#cbd5e1;font-size:11px;font-weight:600;padding:5px 9px;border-radius:8px}
+.btn2.bt.on{background:var(--g);color:#fff;border-color:#4ade80}
 main{max-width:1150px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr;gap:16px}
 @media(min-width:960px){main{grid-template-columns:5fr 6fr;align-items:start}#prev{order:2}#ctrl{order:1}}
 .card{background:#020617b3;border:1px solid #1e293b;border-radius:14px;padding:12px;margin-bottom:12px}
@@ -29,6 +30,7 @@ main{max-width:1150px;margin:0 auto;padding:16px;display:grid;grid-template-colu
 .row .fix{flex:none}
 label.t{display:flex;align-items:center;gap:6px;font-weight:600;font-size:12px;cursor:pointer;flex:none}
 input[type=text],input[type=number],textarea,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;padding:7px 9px;font:600 12px Poppins,sans-serif}
+input[type=color]{width:38px;height:30px;padding:0;border:1px solid #334155;border-radius:8px;background:#0f172a;cursor:pointer;flex:none}
 textarea{resize:vertical}
 input[type=range]{width:100%;accent-color:var(--g)}
 input[type=checkbox]{accent-color:var(--g);width:15px;height:15px}
@@ -45,10 +47,13 @@ small{color:#94a3b8;font-size:11px}
 /* preview */
 #prev{display:flex;flex-direction:column;align-items:center;gap:6px}
 #frameBadge{font-size:11px;font-weight:700;color:var(--g)}
-#cap{position:relative;width:min(100%,520px);aspect-ratio:1/1;overflow:hidden;background:#192b52;container-type:inline-size;touch-action:none;user-select:none;border-radius:6px;box-shadow:0 10px 40px #0008}
-#bgBox{position:absolute;inset:0;z-index:0;overflow:hidden}
+#cap{position:relative;width:min(100%,520px);aspect-ratio:1/1;overflow:hidden;background:#000;container-type:inline-size;touch-action:none;user-select:none;border-radius:6px;box-shadow:0 10px 40px #0008}
+#bgBox{position:absolute;inset:0;z-index:0;overflow:hidden;background:#000}
+#blurL{position:absolute;inset:0;z-index:0;pointer-events:none;display:none;backdrop-filter:blur(calc(var(--bl,0)*1cqw));-webkit-backdrop-filter:blur(calc(var(--bl,0)*1cqw));-webkit-mask-size:100% 100%;mask-size:100% 100%}
+#brushOv{position:absolute;inset:0;z-index:6;cursor:none;touch-action:none}
+#brushCur{position:absolute;z-index:7;border:2px solid #fff;border-radius:50%;pointer-events:none;box-shadow:0 0 0 1px #000a;transform:translate(-50%,-50%);display:none}
 #tbox{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);cursor:move;touch-action:none}
-#tbox img,#tbox video{width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+#tbox img,#tbox video{width:100%;height:100%;object-fit:contain;pointer-events:none;display:block}
 #tbox .bd{position:absolute;inset:0;border:2px dashed #ffffff90;pointer-events:none}
 .hd{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #333;z-index:3}
 #grad{position:absolute;left:0;right:0;bottom:0;height:45%;z-index:1;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
@@ -105,6 +110,18 @@ small{color:#94a3b8;font-size:11px}
       <input type="text" id="url" placeholder="Atau tempel URL gambar / video…">
       <button class="btn2 fix" id="applyUrl">Pakai</button>
     </div>
+    <div class="row">
+      <small class="fix">Mode</small>
+      <select id="fitMode">
+        <option value="fit" selected>Fit – tampil utuh, tidak terpotong (auto sesuai format)</option>
+        <option value="fill">Fill – penuhi kanvas (sisi bisa terpotong)</option>
+      </select>
+    </div>
+    <div class="row">
+      <small class="fix">Warna sisa</small>
+      <input type="color" id="bgc" value="#000000">
+      <small>Warna area kosong jika rasio file beda dengan format.</small>
+    </div>
     <div class="row"><small class="fix">Zoom</small><input type="range" id="zoom" min="20" max="400" value="100"><small class="fix" id="zoomVal">100%</small><button class="btn2 fix" id="resetImg">Reset</button></div>
     <small>Drag gambar untuk geser, tarik titik sudut / scroll untuk zoom.</small>
 
@@ -132,6 +149,26 @@ small{color:#94a3b8;font-size:11px}
       </div>
       <small id="trimInfo"></small>
     </div>
+  </div>
+
+  <div class="card">
+    <h3>Buram Gambar Latar</h3>
+    <div class="seg" id="blurSeg" style="margin-bottom:10px">
+      <button data-m="brush" class="on" style="flex:1">Kuas</button>
+      <button data-m="whole" style="flex:1">Seluruh gambar</button>
+    </div>
+    <div id="brushPanel">
+      <small>Jenis kuas</small>
+      <div class="row" style="margin-top:4px">
+        <button class="btn2 bt on" id="bAdd">✎ Tambahkan buram</button>
+        <button class="btn2 bt" id="bErase">⌫ Hapus</button>
+      </div>
+      <div class="row"><label class="t"><input type="checkbox" id="brushOn">Kuas aktif (gambar tidak bisa digeser saat aktif)</label></div>
+      <div class="row"><small class="fix">Ukuran kuas</small><input type="range" id="bSize" min="1" max="100" value="20"><small class="fix" id="bSizeV">20</small></div>
+    </div>
+    <div class="row"><small class="fix">Intensitas</small><input type="range" id="bInt" min="0" max="100" value="25"><small class="fix" id="bIntV">25</small></div>
+    <button class="btn2" id="bClear" style="width:100%;padding:8px">Hapus buram</button>
+    <div style="margin-top:6px"><small>Kuas: gosok di preview untuk membuat area buram. Buram melekat pada kanvas (bukan pada gambar).</small></div>
   </div>
 
   <div class="card">
@@ -175,6 +212,7 @@ small{color:#94a3b8;font-size:11px}
       <div class="hd" data-h="bl" style="left:-9px;bottom:-9px;cursor:nesw-resize"></div>
       <div class="hd" data-h="br" style="right:-9px;bottom:-9px;cursor:nwse-resize"></div>
     </div></div>
+    <div id="blurL"></div>
     <div id="grad"></div>
     <div id="gV" class="g"></div><div id="gH" class="g"></div>
     <div id="stack">
@@ -191,6 +229,8 @@ small{color:#94a3b8;font-size:11px}
       </div>
       <div id="footTxt"></div>
     </div>
+    <div id="brushOv" class="hid"></div>
+    <div id="brushCur"></div>
   </div>
 </div>
 </main>
@@ -212,6 +252,16 @@ const st={s:1,x:0,y:0};
 
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200);}
 
+/* ---------- mode fit / fill + warna sisa ---------- */
+function applyFit(){
+  const m=$('fitMode').value==='fit'?'contain':'cover';
+  img.style.objectFit=m;vid.style.objectFit=m;
+  $('bgBox').style.background=$('bgc').value;
+  cap.style.background=$('bgc').value;
+}
+$('fitMode').addEventListener('change',()=>{st.x=st.y=0;st.s=1;applyT();applyFit();});
+$('bgc').addEventListener('input',applyFit);
+
 /* ---------- format ---------- */
 function setFormat(k){
   fmt=k;const f=F[k];
@@ -221,7 +271,7 @@ function setFormat(k){
   $('foot').style.bottom=f.foot+'cqw';
   $('frameBadge').textContent=f.label;
   document.querySelectorAll('#fmtSeg button').forEach(b=>b.classList.toggle('on',b.dataset.f===k));
-  st.x=st.y=0;applyT();resetPos();updateDlLabel();
+  st.x=st.y=0;st.s=1;applyT();resetPos();updateDlLabel();initMask();
 }
 function updateDlLabel(){$('dl').textContent=mediaType==='video'?'Download Video':`Download PNG (${F[fmt].w}x${F[fmt].h})`;}
 document.querySelectorAll('#fmtSeg button').forEach(b=>b.onclick=()=>setFormat(b.dataset.f));
@@ -297,10 +347,92 @@ cap.addEventListener('wheel',e=>{e.preventDefault();st.s=Math.min(4,Math.max(.2,
 $('zoom').oninput=e=>{st.s=e.target.value/100;applyT();};
 $('resetImg').onclick=()=>{st.x=st.y=0;st.s=1;applyT();};
 
+/* ---------- buram (blur) gambar latar ---------- */
+const blurL=$('blurL'),ov=$('brushOv'),cur=$('brushCur');
+const mask=document.createElement('canvas'),mctx=mask.getContext('2d');
+let wholeOn=false,btool='add',hasPaint=false,mRaf=0,painting=false,last=null,tcv=null;
+function initMask(){const f=F[fmt];mask.width=600;mask.height=Math.round(600*f.h/f.w);hasPaint=false;syncBlur();}
+function syncBlur(){
+  const i=+$('bInt').value;
+  cap.style.setProperty('--bl',(i*0.1).toFixed(2));
+  $('bSizeV').textContent=$('bSize').value;$('bIntV').textContent=i;
+  blurL.style.display=(i>0&&(wholeOn||hasPaint))?'block':'none';
+  const mi=wholeOn?'none':`url(${mask.toDataURL()})`;
+  blurL.style.webkitMaskImage=mi;blurL.style.maskImage=mi;
+}
+function maskUpdate(){if(mRaf)return;mRaf=requestAnimationFrame(()=>{mRaf=0;syncBlur();});}
+function brushR(){return (+$('bSize').value*0.25/100)*mask.width;}
+function stamp(x,y){
+  const r=brushR();
+  const g=mctx.createRadialGradient(x,y,r*.4,x,y,r);
+  g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');
+  mctx.globalCompositeOperation=btool==='add'?'source-over':'destination-out';
+  mctx.fillStyle=g;mctx.beginPath();mctx.arc(x,y,r,0,Math.PI*2);mctx.fill();
+}
+function mp(e){const R=cap.getBoundingClientRect();return{x:(e.clientX-R.left)/R.width*mask.width,y:(e.clientY-R.top)/R.height*mask.height};}
+function curPos(e){
+  const R=cap.getBoundingClientRect(),d=+$('bSize').value*0.5/100*R.width;
+  cur.style.width=cur.style.height=d+'px';
+  cur.style.left=(e.clientX-R.left)+'px';cur.style.top=(e.clientY-R.top)+'px';cur.style.display='block';
+}
+function paintTo(p){
+  if(!last)stamp(p.x,p.y);
+  else{
+    const dx=p.x-last.x,dy=p.y-last.y,n=Math.max(1,Math.ceil(Math.hypot(dx,dy)/(brushR()*.25)));
+    for(let i=1;i<=n;i++)stamp(last.x+dx*i/n,last.y+dy*i/n);
+  }
+  last=p;if(btool==='add')hasPaint=true;maskUpdate();
+}
+ov.addEventListener('pointerdown',e=>{painting=true;last=null;ov.setPointerCapture(e.pointerId);curPos(e);paintTo(mp(e));e.preventDefault();});
+ov.addEventListener('pointermove',e=>{curPos(e);if(painting)paintTo(mp(e));});
+['pointerup','pointercancel'].forEach(ev=>ov.addEventListener(ev,()=>{painting=false;last=null;}));
+ov.addEventListener('pointerleave',()=>{if(!painting)cur.style.display='none';});
+function updOv(){
+  const on=$('brushOn').checked&&!wholeOn;
+  ov.classList.toggle('hid',!on);
+  if(!on)cur.style.display='none';
+}
+function setBMode(m){
+  wholeOn=m==='whole';
+  document.querySelectorAll('#blurSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  $('brushPanel').classList.toggle('hid',wholeOn);
+  updOv();syncBlur();
+}
+function setTool(t){
+  btool=t;$('bAdd').classList.toggle('on',t==='add');$('bErase').classList.toggle('on',t==='erase');
+  $('brushOn').checked=true;updOv();
+}
+document.querySelectorAll('#blurSeg button').forEach(b=>b.onclick=()=>setBMode(b.dataset.m));
+$('bAdd').onclick=()=>setTool('add');
+$('bErase').onclick=()=>setTool('erase');
+$('brushOn').onchange=updOv;
+$('bSize').oninput=syncBlur;
+$('bInt').oninput=syncBlur;
+$('bClear').onclick=()=>{
+  mctx.globalCompositeOperation='source-over';mctx.clearRect(0,0,mask.width,mask.height);
+  hasPaint=false;setBMode('brush');toast('Buram dihapus');
+};
+function tmpCanvas(W,H){
+  if(!tcv)tcv=document.createElement('canvas');
+  if(tcv.width!==W||tcv.height!==H){tcv.width=W;tcv.height=H;}
+  return tcv;
+}
+function applyBlurCanvas(ctx,W,H){
+  const bi=+$('bInt').value;
+  if(!(bi>0&&(wholeOn||hasPaint)))return;
+  const t=tmpCanvas(W,H),tc=t.getContext('2d');
+  tc.globalCompositeOperation='source-over';tc.clearRect(0,0,W,H);
+  tc.filter=`blur(${bi*0.001*W}px)`;
+  tc.drawImage(ctx.canvas,0,0);
+  tc.filter='none';
+  if(!wholeOn){tc.globalCompositeOperation='destination-in';tc.drawImage(mask,0,0,W,H);tc.globalCompositeOperation='source-over';}
+  ctx.drawImage(t,0,0);
+}
+
 /* ---------- media ---------- */
 function setImage(src){
   mediaType='image';vid.pause();vid.classList.add('hid');img.classList.remove('hid');$('vidPanel').classList.add('hid');
-  img.src=src;$('stack').style.opacity=1;st.x=st.y=0;st.s=1;applyT();updateDlLabel();
+  img.src=src;$('stack').style.opacity=1;st.x=st.y=0;st.s=1;applyT();applyFit();updateDlLabel();
 }
 function setVideo(src){
   mediaType='video';img.classList.add('hid');vid.classList.remove('hid');$('vidPanel').classList.remove('hid');
@@ -309,7 +441,7 @@ function setVideo(src){
     const d=vid.duration||10;$('vSeek').max=d;$('tStart').value=0;$('tEnd').value=d.toFixed(1);$('tEnd').max=d.toFixed(1);
     trimInfo();vid.playbackRate=speed;vid.play();$('play').textContent='Pause';
   };
-  st.x=st.y=0;st.s=1;applyT();updateDlLabel();toast('Video dimuat, speed 1.02x');
+  st.x=st.y=0;st.s=1;applyT();applyFit();updateDlLabel();toast('Video dimuat, speed 1.02x');
 }
 $('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f);f.type.startsWith('video/')?setVideo(u):setImage(u);};
 $('applyUrl').onclick=()=>{const u=$('url').value.trim();if(!u)return;/\.(mp4|webm|mov)(\?.*)?$/i.test(u)?setVideo(u):setImage(u);};
@@ -351,15 +483,20 @@ function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r
 function render(ctx,W,H,op){
   const R=cap.getBoundingClientRect(),k=W/R.width;
   const rel=el=>{const r=el.getBoundingClientRect();return{x:(r.left-R.left)*k,y:(r.top-R.top)*k,w:r.width*k,h:r.height*k};};
-  ctx.save();ctx.fillStyle='#192b52';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.fillStyle=$('bgc').value;ctx.fillRect(0,0,W,H);
 
   const m=mediaType==='video'?vid:img;
   const mw=mediaType==='video'?vid.videoWidth:img.naturalWidth,mh=mediaType==='video'?vid.videoHeight:img.naturalHeight;
   if(mw>0&&mh>0){
-    const ma=mw/mh;let bw,bh;
-    if(ma>W/H){bh=H;bw=H*ma;}else{bw=W;bh=W/ma;}
+    const ma=mw/mh,fit=$('fitMode').value==='fit';let bw,bh;
+    /* fit = contain (utuh), fill = cover (penuh) */
+    if(ma>W/H){ if(fit){bw=W;bh=W/ma;}else{bh=H;bw=H*ma;} }
+    else{ if(fit){bh=H;bw=H*ma;}else{bw=W;bh=W/ma;} }
     ctx.save();ctx.translate(W/2+st.x*k,H/2+st.y*k);ctx.scale(st.s,st.s);ctx.drawImage(m,-bw/2,-bh/2,bw,bh);ctx.restore();
   }
+
+  /* buram gambar latar (hanya media, sebelum overlay) */
+  applyBlurCanvas(ctx,W,H);
 
   if($('gradOn').checked){
     const g=rel($('grad'));const gr=ctx.createLinearGradient(0,g.y,0,g.y+g.h);
@@ -469,6 +606,7 @@ async function exportVideo(f){
   }catch(err){console.error(err);vid.muted=wasMuted;btn.disabled=false;btn.textContent=old;toast('Gagal merekam video');}
 }
 
+applyFit();
 setFormat('instagram');
 document.fonts.ready.then(()=>{upd();applyT();});
 </script>

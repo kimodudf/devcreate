@@ -470,9 +470,11 @@ function fadeOpacity(el){
   if($('fadeOut').checked&&el>=5)o=Math.max(0,1-(el-5)/0.6);
   return o;
 }
+let exporting=false;
 vid.addEventListener('timeupdate',()=>{
   const cur=vid.currentTime,d=vid.duration||10;
   $('vSeek').value=cur;$('vTime').textContent=`${fmtT(cur)} / ${fmtT(d)}`;
+  if(exporting)return; /* saat rekam, jangan ganggu posisi video */
   const s=parseFloat($('tStart').value)||0,e=parseFloat($('tEnd').value)||d;
   if(cur>=e&&!vid.paused)vid.currentTime=s;
   $('stack').style.opacity=mediaType==='video'?fadeOpacity(Math.max(0,cur-s)):1;
@@ -573,37 +575,104 @@ $('dl').onclick=async()=>{
   }catch(err){console.error(err);toast('Gagal render (gambar URL mungkin diblokir CORS, coba upload file)');}
 };
 
-async function exportVideo(f){
-  const btn=$('dl'),old=btn.textContent;btn.disabled=true;btn.textContent='Merekam 0%...';
-  const wasMuted=vid.muted;
-  try{
-    const c=document.createElement('canvas');c.width=f.vw;c.height=f.vh;const ctx=c.getContext('2d');
-    const tracks=[...c.captureStream(30).getVideoTracks()];
-    const s=Math.max(0,parseFloat($('tStart').value)||0);
-    let e=parseFloat($('tEnd').value);if(!e||e<=s)e=vid.duration||10;e=Math.min(e,vid.duration||e);
-    vid.pause();vid.muted=false;vid.currentTime=s;vid.playbackRate=speed;
-    await new Promise(r=>setTimeout(r,300));
-    await vid.play();vid.playbackRate=speed;
-    try{const cs=(vid.captureStream||vid.mozCaptureStream).call(vid);tracks.push(...cs.getAudioTracks());}catch(_){}
-    const mime=['video/mp4;codecs=avc1,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(m=>MediaRecorder.isTypeSupported(m))||'';
-    const rec=new MediaRecorder(new MediaStream(tracks),mime?{mimeType:mime,videoBitsPerSecond:8e6}:undefined);
-    const chunks=[];
-    rec.ondataavailable=ev=>{if(ev.data.size)chunks.push(ev.data);};
-    rec.onstop=()=>{
-      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(chunks,{type:mime||'video/webm'}));
-      a.download=`news_video_${fmt}_${Date.now()}.${mime.includes('mp4')?'mp4':'webm'}`;a.click();
-      vid.muted=wasMuted;btn.disabled=false;btn.textContent=old;toast('Video berhasil di-download');
-    };
-    rec.start();
+/* ---------- export video (versi anti file 0 B) ---------- */
+function seekTo(t){
+  return new Promise(r=>{
+    if(Math.abs(vid.currentTime-t)<0.02)return r();
+    const h=()=>{vid.removeEventListener('seeked',h);r();};
+    vid.addEventListener('seeked',h);
+    vid.currentTime=t;
+    setTimeout(()=>{vid.removeEventListener('seeked',h);r();},1500);
+  });
+}
+
+async function recordOnce(c,ctx,f,s,e,mime,withAudio,onProg){
+  vid.pause();
+  await seekTo(s);
+  const tracks=[...c.captureStream(30).getVideoTracks()];
+  if(withAudio){
+    try{
+      const cs=(vid.captureStream||vid.mozCaptureStream).call(vid);
+      tracks.push(...cs.getAudioTracks());
+    }catch(_){}
+  }
+  render(ctx,f.vw,f.vh,fadeOpacity(0));              /* frame pertama sebelum rekam */
+  const rec=new MediaRecorder(new MediaStream(tracks),mime?{mimeType:mime,videoBitsPerSecond:8e6}:undefined);
+  const chunks=[];
+  rec.ondataavailable=ev=>{if(ev.data&&ev.data.size)chunks.push(ev.data);};
+  rec.onerror=ev=>console.error('MediaRecorder error',ev.error||ev);
+  const stopped=new Promise(res=>{rec.onstop=res;});
+  rec.start(500);                                    /* timeslice: data dikirim tiap 0.5 dtk */
+  await vid.play();
+  vid.playbackRate=speed;
+  let run=true;
+  await new Promise(done=>{
+    const guard=setTimeout(()=>{run=false;done();},((e-s)/speed+6)*1000);
     const loop=()=>{
+      if(!run)return;
       const cur=vid.currentTime,el=Math.max(0,cur-s);
-      btn.textContent=`Merekam ${Math.min(100,Math.round(el/Math.max(.5,e-s)*100))}%...`;
-      render(ctx,f.vw,f.vh,mediaType==='video'?fadeOpacity(el):1);
-      if(!vid.ended&&cur<e-0.05)requestAnimationFrame(loop);
-      else{vid.pause();setTimeout(()=>{if(rec.state==='recording')rec.stop();},200);}
+      onProg(Math.min(100,Math.round(el/Math.max(.5,e-s)*100)));
+      render(ctx,f.vw,f.vh,fadeOpacity(el));
+      if(!vid.ended&&!vid.paused&&cur<e-0.05)requestAnimationFrame(loop);
+      else{run=false;clearTimeout(guard);done();}
     };
     requestAnimationFrame(loop);
-  }catch(err){console.error(err);vid.muted=wasMuted;btn.disabled=false;btn.textContent=old;toast('Gagal merekam video');}
+  });
+  vid.pause();
+  await new Promise(r=>setTimeout(r,250));
+  try{rec.requestData();}catch(_){}
+  if(rec.state!=='inactive')rec.stop();
+  await stopped;
+  tracks.forEach(t=>{try{t.stop();}catch(_){}});
+  return new Blob(chunks,{type:mime||'video/webm'});
+}
+
+async function exportVideo(f){
+  const btn=$('dl'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='Menyiapkan...';
+  const wasMuted=vid.muted,wasLoop=vid.loop;
+  exporting=true;
+  try{
+    if(typeof MediaRecorder==='undefined')throw new Error('MediaRecorder tidak didukung browser ini');
+    const c=document.createElement('canvas');c.width=f.vw;c.height=f.vh;
+    const ctx=c.getContext('2d');
+    const s=Math.max(0,parseFloat($('tStart').value)||0);
+    let e=parseFloat($('tEnd').value);
+    if(!e||e<=s)e=vid.duration||10;
+    e=Math.min(e,vid.duration||e);
+
+    vid.loop=false;vid.muted=false;
+    const mimes=['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
+      .filter(m=>MediaRecorder.isTypeSupported(m));
+    if(!mimes.length)mimes.push('');
+
+    let blob=null,used='';
+    for(const m of mimes.slice(0,3)){
+      blob=await recordOnce(c,ctx,f,s,e,m,true,p=>{btn.textContent=`Merekam ${p}%...`;});
+      if(blob&&blob.size>2000){used=m;break;}       /* 0 B / hampir kosong -> coba format berikutnya */
+      console.warn('Hasil kosong dengan format',m,'-> coba format lain');
+      blob=null;
+    }
+    if(!blob)throw new Error('Semua format menghasilkan file kosong');
+
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`news_video_${fmt}_${Date.now()}.${used.includes('mp4')?'mp4':'webm'}`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    toast('Video berhasil di-download');
+  }catch(err){
+    console.error(err);
+    toast('Gagal merekam video: '+(err.message||err));
+  }finally{
+    exporting=false;
+    vid.muted=wasMuted;vid.loop=wasLoop;
+    seekTo(parseFloat($('tStart').value)||0);
+    $('play').textContent='Play';
+    $('stack').style.opacity=1;
+    btn.disabled=false;btn.textContent=old;
+  }
 }
 
 applyFit();

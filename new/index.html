@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--g:#E11D48;--cap:#111315;--hl:#F8FAFC;--sub:#A1A1AA}
+:root{--g:#E11D48;--cap:#111315;--hl:#fdb90a;--sub:#A1A1AA}
 *{box-sizing:border-box}
 body{margin:0;font-family:Poppins,sans-serif;background:#0f172a;color:#e2e8f0;font-size:13px}
 header{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 16px;background:#020617;border-bottom:1px solid #1e293b}
@@ -58,7 +58,7 @@ small{color:#94a3b8;font-size:11px}
 #stack{position:absolute;left:5cqw;right:5cqw;bottom:11cqw;z-index:2;pointer-events:none}
 #stack .drag{pointer-events:auto;cursor:move;touch-action:none}
 #metaRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2cqw}
-#tag{background:var(--g);color:var(--hl);font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
+#tag{background:var(--g);color:#F8FAFC;font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
 #credit{margin-left:auto;background:rgba(17,19,21,.9);border:1px solid rgba(161,161,170,.35);color:var(--sub);font-weight:700;font-size:2.1cqw;padding:.7cqw 2.2cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
 #capBox{background:rgba(17,19,21,.9);padding:3.2cqw 4.2cqw}
 #hl{margin:0;color:var(--hl);font-weight:900;font-size:5.4cqw;line-height:1.14;letter-spacing:-.025em;white-space:pre-wrap;word-break:break-word;text-align:left}
@@ -241,7 +241,8 @@ small{color:#94a3b8;font-size:11px}
 const $=id=>document.getElementById(id);
 /* palet */
 const G='#111315';      /* latar caption (alpha 90%) */
-const W_='#F8FAFC';     /* teks headline */
+const W_='#F8FAFC';     /* teks badge */
+const HL='#fdb90a';     /* teks headline */
 const GRAY='#A1A1AA';   /* sub-teks / handle / sumber */
 const F={
   instagram:{w:1080,h:1080,vw:1080,vh:1080,fw:520,bot:11,foot:3.5,label:'1080 x 1080 (IG Feed 1:1)'},
@@ -539,7 +540,7 @@ function render(ctx,W,H,op){
         lines.push(cur);
       });
       const center=$('al').value==='center';
-      ctx.fillStyle=W_;ctx.textAlign=center?'center':'left';
+      ctx.fillStyle=HL;ctx.textAlign=center?'center':'left';
       const tx=center?h.x+h.w/2:h.x,y0=b.y+(b.h-lines.length*lh)/2+lh/2;
       lines.forEach((l,i)=>ctx.fillText(l,tx,y0+i*lh+fs*.04));
       if('letterSpacing' in ctx)ctx.letterSpacing='0px';

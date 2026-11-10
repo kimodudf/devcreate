@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--g:#E11D48;--cap:#111315;--hl:#F8FAFC;--sub:#A1A1AA}
+:root{--g:#142e27}
 *{box-sizing:border-box}
 body{margin:0;font-family:Poppins,sans-serif;background:#0f172a;color:#e2e8f0;font-size:13px}
 header{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 16px;background:#020617;border-bottom:1px solid #1e293b}
@@ -16,11 +16,11 @@ header h1{font-size:15px;margin:0;color:var(--g)}
 button{font-family:inherit;cursor:pointer}
 .seg{display:flex;gap:4px;background:#0f172a;border:1px solid #1e293b;padding:3px;border-radius:10px}
 .seg button{border:0;background:none;color:#94a3b8;font-weight:700;font-size:12px;padding:6px 10px;border-radius:8px}
-.seg button.on{background:var(--g);color:#fff}
-.btn{border:0;background:var(--g);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px}
+.seg button.on{background:var(--g);color:#000}
+.btn{border:0;background:var(--g);color:#000;font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px}
 .btn:disabled{opacity:.6}
 .btn2{border:1px solid #334155;background:#1e293b;color:#cbd5e1;font-size:11px;font-weight:600;padding:5px 9px;border-radius:8px}
-.btn2.bt.on{background:var(--g);color:#fff;border-color:#fb7185}
+.btn2.bt.on{background:var(--g);color:#fff;border-color:#4ade80}
 main{max-width:1150px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr;gap:16px}
 @media(min-width:960px){main{grid-template-columns:5fr 6fr;align-items:start}#prev{order:2}#ctrl{order:1}}
 .card{background:#020617b3;border:1px solid #1e293b;border-radius:14px;padding:12px;margin-bottom:12px}
@@ -36,6 +36,7 @@ input[type=range]{width:100%;accent-color:var(--g)}
 input[type=checkbox]{accent-color:var(--g);width:15px;height:15px}
 small{color:#94a3b8;font-size:11px}
 .hid{display:none!important}
+/* modal */
 #modal{position:fixed;inset:0;z-index:60;background:#000d;display:flex;align-items:center;justify-content:center;padding:16px}
 #modal .box{background:#020617;border:1px solid #1e293b;border-radius:20px;padding:24px;max-width:560px;width:100%;text-align:center}
 #modal h2{margin:0 0 16px;color:var(--g)}
@@ -43,6 +44,7 @@ small{color:#94a3b8;font-size:11px}
 #modal .opts button{background:#0f172a;border:2px solid #334155;border-radius:14px;padding:16px 8px;color:#fff}
 #modal .opts button:hover{border-color:var(--g)}
 #modal b{display:block;font-size:14px}#modal span{font-size:11px;color:#94a3b8}
+/* preview */
 #prev{display:flex;flex-direction:column;align-items:center;gap:6px}
 #frameBadge{font-size:11px;font-weight:700;color:var(--g)}
 #cap{position:relative;width:min(100%,520px);aspect-ratio:1/1;overflow:hidden;background:#000;container-type:inline-size;touch-action:none;user-select:none;border-radius:6px;box-shadow:0 10px 40px #0008}
@@ -58,19 +60,19 @@ small{color:#94a3b8;font-size:11px}
 #stack{position:absolute;left:5cqw;right:5cqw;bottom:11cqw;z-index:2;pointer-events:none}
 #stack .drag{pointer-events:auto;cursor:move;touch-action:none}
 #metaRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2cqw}
-#tag{background:var(--g);color:var(--hl);font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
-#credit{margin-left:auto;background:rgba(17,19,21,.9);border:1px solid rgba(161,161,170,.35);color:var(--sub);font-weight:700;font-size:2.1cqw;padding:.7cqw 2.2cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
-#capBox{background:rgba(17,19,21,.9);padding:3.2cqw 4.2cqw}
-#hl{margin:0;color:var(--hl);font-weight:900;font-size:5.4cqw;line-height:1.14;letter-spacing:-.025em;white-space:pre-wrap;word-break:break-word;text-align:left}
+#tag{background:var(--g);color:#fff;font-weight:900;font-size:2.6cqw;padding:.7cqw 2.8cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
+#credit{margin-left:auto;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:700;font-size:2.1cqw;padding:.7cqw 2.2cqw;border-radius:.8cqw;text-transform:uppercase;line-height:1.3}
+#capBox{background:var(--g);padding:3.2cqw 4.2cqw}
+#hl{margin:0;color:#fff;font-weight:900;font-size:5.4cqw;line-height:1.14;letter-spacing:-.025em;white-space:pre-wrap;word-break:break-word;text-align:left}
 #foot{position:absolute;left:5cqw;right:5cqw;bottom:3.5cqw;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:3cqw;pointer-events:none}
-#wm{display:flex;align-items:center;gap:1cqw;color:var(--sub);font-weight:700;font-size:2.8cqw;white-space:nowrap}
+#wm{display:flex;align-items:center;gap:1cqw;color:#fff;font-weight:700;font-size:2.8cqw;white-space:nowrap}
 #wmIcon{width:3.4cqw;height:3.4cqw;display:block}
-#footTxt{color:var(--sub);font-weight:600;font-size:2.4cqw;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#footTxt{color:#fff;font-weight:600;font-size:2.4cqw;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cap .g{position:absolute;z-index:5;pointer-events:none;transition:border-color .1s}
 #gV{top:0;bottom:0;left:50%;width:0;border-left:1px dashed rgba(255,255,255,.5)}
 #gH{left:0;right:0;top:50%;height:0;border-top:1px dashed rgba(255,255,255,.5)}
-#cap .g.hot{border-color:#E11D48;border-style:solid}
-#toast{position:fixed;bottom:20px;right:20px;background:var(--g);color:#fff;font-weight:700;font-size:12px;padding:9px 14px;border-radius:10px;opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none;z-index:70}
+#cap .g.hot{border-color:#142e27;border-style:solid}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--g);color:#000;font-weight:700;font-size:12px;padding:9px 14px;border-radius:10px;opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none;z-index:70}
 #toast.on{opacity:1;transform:none}
 </style>
 </head>
@@ -101,7 +103,9 @@ small{color:#94a3b8;font-size:11px}
 
   <div class="card">
     <h3>Gambar / Video Latar</h3>
-    <div class="row"><input type="file" id="file" accept="image/*,video/*"></div>
+    <div class="row">
+      <input type="file" id="file" accept="image/*,video/*">
+    </div>
     <div class="row">
       <input type="text" id="url" placeholder="Atau tempel URL gambar / video…">
       <button class="btn2 fix" id="applyUrl">Pakai</button>
@@ -182,10 +186,6 @@ small{color:#94a3b8;font-size:11px}
   <div class="card">
     <h3>Tag &amp; Sumber</h3>
     <div class="row"><label class="t"><input type="checkbox" id="tagOn" checked>Tag</label><input type="text" id="tagIn" value="NEWS"></div>
-    <div class="row">
-      <small class="fix">Warna badge</small>
-      <select id="tagClr"><option value="#E11D48" selected>Crimson Red (#E11D48)</option><option value="#F59E0B">Amber Gold (#F59E0B)</option></select>
-    </div>
     <div class="row"><label class="t"><input type="checkbox" id="crOn" checked>Sumber</label><input type="text" id="crIn" value="Sumber: Twitter/X"></div>
     <small>Tag &amp; sumber bisa digeser bebas (juga saat caption dimatikan).</small>
     <div class="row" style="margin-top:8px"><button class="btn2" id="resetPos">Reset Posisi Caption / Tag / Sumber</button></div>
@@ -196,7 +196,7 @@ small{color:#94a3b8;font-size:11px}
     <div class="row"><label class="t"><input type="checkbox" id="ftOn" checked>Teks kanan</label><input type="text" id="ftIn" value="Ikuti media sosial resmi GENFEEDZ!"></div>
     <div class="row"><label class="t"><input type="checkbox" id="gradOn" checked>Gradien gelap bawah</label></div>
     <div class="row"><label class="t"><input type="checkbox" id="guideOn" checked>Garis bantu tengah</label><label class="t"><input type="checkbox" id="snapOn" checked>Snap ke tengah</label></div>
-    <small>Watermark Instagram @genfeedz bersifat paten &amp; selalu tampil.</small>
+    <small>Watermark Instagram @genfeedz (putih) bersifat paten &amp; selalu tampil.</small>
   </div>
 </div>
 
@@ -224,7 +224,7 @@ small{color:#94a3b8;font-size:11px}
     </div>
     <div id="foot">
       <div id="wm">
-        <svg id="wmIcon" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1.2" fill="#A1A1AA" stroke="none"/></svg>
+        <svg id="wmIcon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1.2" fill="#fff" stroke="none"/></svg>
         <span id="wmText">@genfeedz</span>
       </div>
       <div id="footTxt"></div>
@@ -239,10 +239,8 @@ small{color:#94a3b8;font-size:11px}
 
 <script>
 const $=id=>document.getElementById(id);
-/* palet */
-const G='#111315';      /* latar caption (alpha 90%) */
-const W_='#F8FAFC';     /* teks headline */
-const GRAY='#A1A1AA';   /* sub-teks / handle / sumber */
+const G='#142e27';
+const W_='#ffffff';
 const F={
   instagram:{w:1080,h:1080,vw:1080,vh:1080,fw:520,bot:11,foot:3.5,label:'1080 x 1080 (IG Feed 1:1)'},
   reels:{w:1080,h:1920,vw:1080,vh:1920,fw:340,bot:34,foot:22,label:'1080 x 1920 (IG Reels 9:16)'},
@@ -305,16 +303,12 @@ function resetPos(){offs.forEach((o,el)=>{o.x=o.y=0;el.style.transform='';});}
 $('resetPos').onclick=()=>{resetPos();toast('Posisi di-reset');};
 
 /* ---------- teks & toggle ---------- */
-function tagColor(){return $('tagClr').value;}
-function tagText(){return $('tagClr').value==='#F59E0B'?'#111315':W_;}
 function upd(){
   $('hl').textContent=$('hlIn').value||'Ketik judul berita';
   $('hl').style.fontSize=$('hlSize').value+'cqw';
   $('hl').style.lineHeight=$('lh').value;
   $('hl').style.textAlign=$('al').value;
   $('tag').textContent=$('tagIn').value||'TAG';
-  $('tag').style.background=tagColor();
-  $('tag').style.color=tagText();
   $('credit').textContent=$('crIn').value;
   $('footTxt').textContent=$('ftIn').value;
   $('capBox').classList.toggle('hid',!$('capOn').checked);
@@ -326,7 +320,7 @@ function upd(){
   $('gV').classList.toggle('hid',!$('guideOn').checked);
   $('gH').classList.toggle('hid',!$('guideOn').checked);
 }
-['hlIn','hlSize','lh','al','tagIn','tagClr','crIn','ftIn','capOn','tagOn','crOn','ftOn','gradOn','guideOn'].forEach(id=>{$(id).addEventListener('input',upd);$(id).addEventListener('change',upd);});
+['hlIn','hlSize','lh','al','tagIn','crIn','ftIn','capOn','tagOn','crOn','ftOn','gradOn','guideOn'].forEach(id=>{$(id).addEventListener('input',upd);$(id).addEventListener('change',upd);});
 upd();
 
 /* ---------- transform media ---------- */
@@ -480,7 +474,7 @@ let exporting=false;
 vid.addEventListener('timeupdate',()=>{
   const cur=vid.currentTime,d=vid.duration||10;
   $('vSeek').value=cur;$('vTime').textContent=`${fmtT(cur)} / ${fmtT(d)}`;
-  if(exporting)return;
+  if(exporting)return; /* saat rekam, jangan ganggu posisi video */
   const s=parseFloat($('tStart').value)||0,e=parseFloat($('tEnd').value)||d;
   if(cur>=e&&!vid.paused)vid.currentTime=s;
   $('stack').style.opacity=mediaType==='video'?fadeOpacity(Math.max(0,cur-s)):1;
@@ -497,11 +491,13 @@ function render(ctx,W,H,op){
   const mw=mediaType==='video'?vid.videoWidth:img.naturalWidth,mh=mediaType==='video'?vid.videoHeight:img.naturalHeight;
   if(mw>0&&mh>0){
     const ma=mw/mh,fit=$('fitMode').value==='fit';let bw,bh;
+    /* fit = contain (utuh), fill = cover (penuh) */
     if(ma>W/H){ if(fit){bw=W;bh=W/ma;}else{bh=H;bw=H*ma;} }
     else{ if(fit){bh=H;bw=H*ma;}else{bw=W;bh=W/ma;} }
     ctx.save();ctx.translate(W/2+st.x*k,H/2+st.y*k);ctx.scale(st.s,st.s);ctx.drawImage(m,-bw/2,-bh/2,bw,bh);ctx.restore();
   }
 
+  /* buram gambar latar (hanya media, sebelum overlay) */
   applyBlurCanvas(ctx,W,H);
 
   if($('gradOn').checked){
@@ -515,20 +511,20 @@ function render(ctx,W,H,op){
     ctx.textBaseline='middle';
     if($('tagOn').checked){
       const b=rel($('tag')),fs=parseFloat(getComputedStyle($('tag')).fontSize)*k;
-      ctx.fillStyle=tagColor();rr(ctx,b.x,b.y,b.w,b.h,.8*W/100);ctx.fill();
-      ctx.font=`900 ${fs}px Poppins,sans-serif`;ctx.fillStyle=tagText();ctx.textAlign='center';
+      ctx.fillStyle=G;rr(ctx,b.x,b.y,b.w,b.h,.8*W/100);ctx.fill();
+      ctx.font=`900 ${fs}px Poppins,sans-serif`;ctx.fillStyle=W_;ctx.textAlign='center';
       ctx.fillText(($('tagIn').value||'TAG').toUpperCase(),b.x+b.w/2,b.y+b.h/2+fs*.05);
     }
     if($('crOn').checked){
       const b=rel($('credit')),fs=parseFloat(getComputedStyle($('credit')).fontSize)*k;
-      ctx.fillStyle='rgba(17,19,21,.9)';rr(ctx,b.x,b.y,b.w,b.h,.8*W/100);ctx.fill();
-      ctx.strokeStyle='rgba(161,161,170,.35)';ctx.lineWidth=Math.max(1,k);ctx.stroke();
-      ctx.font=`700 ${fs}px Poppins,sans-serif`;ctx.fillStyle=GRAY;ctx.textAlign='center';
+      ctx.fillStyle='rgba(0,0,0,.6)';rr(ctx,b.x,b.y,b.w,b.h,.8*W/100);ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=Math.max(1,k);ctx.stroke();
+      ctx.font=`700 ${fs}px Poppins,sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='center';
       ctx.fillText($('crIn').value.toUpperCase(),b.x+b.w/2,b.y+b.h/2+fs*.05);
     }
     if($('capOn').checked){
       const b=rel($('capBox'));
-      ctx.save();ctx.globalAlpha=op*.9;ctx.fillStyle=G;ctx.fillRect(b.x,b.y,b.w,b.h);ctx.restore();
+      ctx.fillStyle=G;ctx.fillRect(b.x,b.y,b.w,b.h);
       const hs=getComputedStyle($('hl')),fs=parseFloat(hs.fontSize)*k,lh=fs*(parseFloat($('lh').value)||1.14);
       const h=rel($('hl'));
       ctx.font=`900 ${fs}px Poppins,sans-serif`;
@@ -547,20 +543,20 @@ function render(ctx,W,H,op){
     ctx.restore();
   }
 
-  /* watermark paten @genfeedz (abu-abu netral, selalu tampil) */
+  /* watermark paten @genfeedz (putih, selalu tampil) */
   const ic=rel($('wmIcon')),wt=rel($('wmText')),wfs=parseFloat(getComputedStyle($('wmText')).fontSize)*k;
   ctx.save();ctx.translate(ic.x,ic.y);ctx.scale(ic.w/24,ic.h/24);
-  ctx.strokeStyle=GRAY;ctx.fillStyle=GRAY;ctx.lineWidth=2;
+  ctx.strokeStyle=W_;ctx.fillStyle=W_;ctx.lineWidth=2;
   rr(ctx,2,2,20,20,6);ctx.stroke();
   ctx.beginPath();ctx.arc(12,12,4.6,0,Math.PI*2);ctx.stroke();
   ctx.beginPath();ctx.arc(17.6,6.4,1.2,0,Math.PI*2);ctx.fill();
   ctx.restore();
-  ctx.font=`700 ${wfs}px Poppins,sans-serif`;ctx.fillStyle=GRAY;ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.font=`700 ${wfs}px Poppins,sans-serif`;ctx.fillStyle=W_;ctx.textAlign='left';ctx.textBaseline='middle';
   ctx.fillText('@genfeedz',wt.x,wt.y+wt.h/2);
 
   if($('ftOn').checked){
     const ft=rel($('footTxt')),ffs=parseFloat(getComputedStyle($('footTxt')).fontSize)*k;
-    ctx.font=`600 ${ffs}px Poppins,sans-serif`;ctx.fillStyle=GRAY;ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.font=`600 ${ffs}px Poppins,sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='right';ctx.textBaseline='middle';
     ctx.fillText($('ftIn').value,ft.x+ft.w,ft.y+ft.h/2);
   }
   ctx.restore();
@@ -579,7 +575,7 @@ $('dl').onclick=async()=>{
   }catch(err){console.error(err);toast('Gagal render (gambar URL mungkin diblokir CORS, coba upload file)');}
 };
 
-/* ---------- export video ---------- */
+/* ---------- export video (versi anti file 0 B) ---------- */
 function seekTo(t){
   return new Promise(r=>{
     if(Math.abs(vid.currentTime-t)<0.02)return r();
@@ -600,13 +596,13 @@ async function recordOnce(c,ctx,f,s,e,mime,withAudio,onProg){
       tracks.push(...cs.getAudioTracks());
     }catch(_){}
   }
-  render(ctx,f.vw,f.vh,fadeOpacity(0));
+  render(ctx,f.vw,f.vh,fadeOpacity(0));              /* frame pertama sebelum rekam */
   const rec=new MediaRecorder(new MediaStream(tracks),mime?{mimeType:mime,videoBitsPerSecond:8e6}:undefined);
   const chunks=[];
   rec.ondataavailable=ev=>{if(ev.data&&ev.data.size)chunks.push(ev.data);};
   rec.onerror=ev=>console.error('MediaRecorder error',ev.error||ev);
   const stopped=new Promise(res=>{rec.onstop=res;});
-  rec.start(500);
+  rec.start(500);                                    /* timeslice: data dikirim tiap 0.5 dtk */
   await vid.play();
   vid.playbackRate=speed;
   let run=true;
@@ -653,7 +649,7 @@ async function exportVideo(f){
     let blob=null,used='';
     for(const m of mimes.slice(0,3)){
       blob=await recordOnce(c,ctx,f,s,e,m,true,p=>{btn.textContent=`Merekam ${p}%...`;});
-      if(blob&&blob.size>2000){used=m;break;}
+      if(blob&&blob.size>2000){used=m;break;}       /* 0 B / hampir kosong -> coba format berikutnya */
       console.warn('Hasil kosong dengan format',m,'-> coba format lain');
       blob=null;
     }
